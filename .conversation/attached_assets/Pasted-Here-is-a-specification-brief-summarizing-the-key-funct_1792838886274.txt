@@ -1,0 +1,68 @@
+Here is a specification brief summarizing the key functionality and requirements to hand off to the developer building the cross-platform application:
+
+---
+
+### Key Application Features & Requirements
+
+* **Configuration Options**
+
+
+* **Source & Destination:** Configurable input directory and output directory paths.
+
+
+* **Operation Type:** Switchable mode between **Copy** and **Move** operations.
+
+
+* **Exclusion Filters:** Array of substring/pattern filters to skip specific filenames or hidden folders (e.g., `.trashed`, `temp`).
+
+
+
+
+* **Metadata Extraction (Date-Based Sorting)**
+
+
+* **Images:** Extract the date taken using standard EXIF tags (specifically `DateTimeOriginal`, `DateTime`, or `DateTimeDigitized`).
+
+
+* **Videos (`.mp4`):** Read the "Media Created" creation timestamp from video container metadata.
+
+
+* **Parsing Fallbacks:** Clean non-printable characters from metadata strings and fallback to invariant culture/ISO parsing if local system culture parsing fails.
+
+
+
+
+* **Directory Structuring & Processing Strategy**
+
+
+* **Folder Hierarchy:** Automatically construct and nest destination folders in the format `/YYYY/MM/` based on the extracted metadata timestamp.
+
+
+* **Strict Date Requirement:** Skip files that do not contain valid image EXIF or video metadata dates.
+
+
+* **Conflict Handling & Force Overwrite:** Overwrite or handle existing destination files during copy/move operations.
+
+
+
+
+* **Execution Tracking & Summary**
+
+
+* Real-time logging of file operations, pattern exclusions, and parsing errors.
+
+
+* End-of-run summary metrics reporting: Total files, Processed count, Skipped count (missing metadata), and Excluded count.
+
+
+
+
+
+---
+
+### Cross-Platform Implementation Notes for the App Agent
+
+* **Platform Dependencies to Replace:** The original script relies heavily on Windows-specific COM APIs (`Shell.Application` for video properties and Windows `System.Drawing` assemblies).
+
+
+* **Target Solution:** Use cross-platform metadata parsing libraries (e.g., `ExifTool` wrapper, `FFmpeg` / `ffprobe`, `ExifLib`, or native framework media/image decoders like C# `MetadataExtractor` or Node `exif-reader`) to handle media parsing across Windows, macOS, and Linux.

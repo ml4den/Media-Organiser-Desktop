@@ -53,3 +53,5 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+/generated-artifacts/
+/artifacts/media-organiser/public/Media-Organiser-Desktop.zip

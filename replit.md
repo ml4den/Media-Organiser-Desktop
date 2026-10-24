@@ -1,15 +1,21 @@
-# [Project name]
+# Media Organiser
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A local-first cross-platform desktop utility based on the user's PowerShell media organiser, with a browser preview of the same interface.
 
 ## Run & Operate
+
+- `pnpm --filter @workspace/media-organiser desktop:start` — build the renderer and launch Electron locally on a graphical desktop
+- `pnpm --filter @workspace/media-organiser desktop:package` — build platform installers on the target OS
+- `pnpm --filter @workspace/media-organiser desktop:build` then `desktop:export` — refresh the downloadable desktop project ZIP
+- Preview workflow: `artifacts/media-organiser: web`
+- Desktop documentation: `artifacts/media-organiser/README.md`
 
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Media Organiser needs no database, secrets, accounts or external integrations. The shared API template is unused by this product.
 
 ## Stack
 
@@ -26,7 +32,10 @@ _Populate as you build — short repo map plus pointers to the source-of-truth f
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The desktop app is the primary product; browser mode is a useful preview, not a substitute for native filesystem access. **Why:** the user asked for a cross-platform desktop app operating on local media.
+- Browser previews must not upload personal files or pretend to move them. ZIP export provides useful local-only functionality when write permissions are unavailable.
+- Copy + rename is the safe default rather than the original script's Move + forced overwrite. Destructive choices require explicit confirmation.
+- Dates remain strict media-metadata dates, not guessed filesystem or filename dates. Structured ExifTool values replace locale-dependent Windows shell date strings.
 
 ## Product
 
@@ -34,7 +43,8 @@ _Describe the high-level user-facing capabilities of this app once they exist._
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- The user values customisable processing and personally prefers `YYYY/MM/media-files-here`, while wanting other users to be able to choose a custom folder hierarchy.
+- Keep the app simple and intuitive, with source/destination selection and drag-and-drop files and folders.
 
 ## Gotchas
 

@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Media Organiser"
+description = "A local-first cross-platform desktop media organiser with folder selection, drag-and-drop, metadata-based date sorting, custom folder structures, safe copy/move and processing logs. Includes an Electron desktop application and browser preview."
+version = "1.0.0"
+id = "artifacts/media-organiser"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24883
+
+[services.development]
+run = "pnpm --filter @workspace/media-organiser run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/media-organiser", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/media-organiser/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24883"
+BASE_PATH = "/"

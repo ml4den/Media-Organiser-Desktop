@@ -1,0 +1,31 @@
+appId: com.mediaorganiser.desktop
+productName: Media Organiser
+copyright: Copyright © 2026 Media Organiser contributors
+directories:
+  output: ../../generated-artifacts/desktop
+files:
+  - desktop/**/*
+  - shared/**/*
+  - dist/public/**/*
+  - "!dist/public/Media-Organiser-Desktop.zip"
+  - package.json
+asar: true
+asarUnpack:
+  - node_modules/exiftool-vendored*/**/*
+npmRebuild: false
+mac:
+  category: public.app-category.photography
+  target:
+    - dmg
+    - zip
+win:
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+linux:
+  category: Photography
+  target:
+    - AppImage
+    - deb
