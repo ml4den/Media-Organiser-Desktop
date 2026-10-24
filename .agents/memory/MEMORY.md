@@ -1,1 +1,2 @@
 - [Desktop platform testing](desktop-platform-testing.md) — Windows user-tested; macOS “damaged” failure requires complete bundle seals, not just archive checks.
+- [Web distribution intent](web-distribution.md) — User wants a functional static browser app alongside desktop releases, not just a download website.
