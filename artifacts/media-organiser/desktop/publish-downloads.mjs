@@ -14,6 +14,9 @@ for (const name of candidates) {
   if (!/^Media-Organiser-[\d.]+-(linux|win|mac)-[\w_]+\.(AppImage|exe|dmg|zip)$/.test(name)) continue;
   if (name.endsWith(".zip") && !name.includes("-win-") && !name.includes("-mac-")) continue;
   const [, version, os, arch] = name.match(/^Media-Organiser-([\d.]+)-(linux|win|mac)-([\w_]+)\./);
+  // Withdraw the macOS test release reported as damaged. Do not re-offer it
+  // if a later package is absent from a local or CI output directory.
+  if (os === "mac" && version === "1.0.1") continue;
   const key = `${os}-${arch}-${path.extname(name)}`;
   if (seen.has(key)) continue;
   seen.add(key);
@@ -25,4 +28,9 @@ for (const name of candidates) {
 if (!files.length) throw new Error("No built release packages found; downloads were not changed.");
 await fs.writeFile(path.join(destination, "releases.json"), JSON.stringify({ files }, null, 2));
 await fs.writeFile(path.join(destination, "SHA256SUMS.txt"), files.map((f) => `${f.sha256}  ${f.name}\n`).join(""));
+for (const name of await fs.readdir(destination)) {
+  if (/^Media-Organiser-1\.0\.1-mac-(arm64|x64)\.(zip|dmg)$/.test(name)) {
+    await fs.unlink(path.join(destination, name));
+  }
+}
 console.log(`Published ${files.length} built package(s) to the preview download area.`);

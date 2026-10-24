@@ -1,1 +1,1 @@
-- [Desktop platform testing](desktop-platform-testing.md) — user confirmed the Windows build works; distinguish this from untested macOS packages.
+- [Desktop platform testing](desktop-platform-testing.md) — Windows user-tested; macOS “damaged” failure requires complete bundle seals, not just archive checks.

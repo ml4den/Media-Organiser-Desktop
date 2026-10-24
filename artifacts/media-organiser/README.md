@@ -40,12 +40,19 @@ the default icon may be generic. The user has confirmed that the Windows build w
 self-contained Apple Silicon (arm64) and Intel (x64) packages. On Linux these
 are ZIP archives containing a complete `.app`, including the matching macOS
 Electron and pinned portable Perl runtime; DMG creation requires a native Mac.
-Extract the ZIP and drag `Media Organiser.app` to Applications. Builds are unsigned
-and not notarised, and have not been run on a Mac. If blocked, use macOS System
+Extract the ZIP and drag `Media Organiser.app` to Applications. Starting with 1.0.2,
+the entire bundle and nested Mach-O binaries are ad-hoc signed after packaging.
+Linux x64 builds use checksum-pinned rcodesign; native Mac builds use codesign.
+This is integrity signing, not a trusted Apple Developer ID or notarisation.
+Version 1.0.1 was reported as “damaged” on macOS and must not be redistributed.
+The replacement has not yet been launch-tested on a Mac. For an unidentified
+developer warning, use macOS System
 Settings → Privacy & Security → Open Anyway only for a download you trust.
 Do not disable Gatekeeper globally. Test copies of media with Copy + Rename first.
 Windows requires Windows 10+; bundled macOS Perl requires macOS 15+.
-Unsigned builds may show Windows SmartScreen/macOS Gatekeeper warnings.
+Windows builds without a publisher certificate and ad-hoc macOS builds may show
+SmartScreen/Gatekeeper warnings. A “damaged” warning is not a normal acceptance
+check: stop and investigate rather than telling users to disable OS security.
 Signing/notarisation credentials are not included or configured.
 
 ## Packaging and verification

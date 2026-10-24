@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import { build, Platform, Arch } from "electron-builder";
+import { signMacBundle } from "./sign-mac.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.resolve(root, "../../generated-artifacts/desktop");
@@ -108,6 +109,11 @@ await build({
     extraResources: [{ from: "runtime", to: "runtime" }],
     asar: true, asarUnpack: ["node_modules/exiftool-vendored*/**/*", "**/node_modules/exiftool-vendored*/**/*"],
     npmRebuild: false,
+    afterPack: async (context) => {
+      if (context.electronPlatformName === "darwin") {
+        await signMacBundle(path.join(context.appOutDir, "Media Organiser.app"));
+      }
+    },
     artifactName: "Media-Organiser-${version}-${os}-${arch}.${ext}",
     mac: { category: "public.app-category.photography", minimumSystemVersion: "15.0", target: ["dmg", "zip"], identity: null },
     win: {
