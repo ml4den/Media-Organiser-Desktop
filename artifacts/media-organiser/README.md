@@ -74,9 +74,15 @@ Run it only after checking the release. Then rebuild/export source if needed.
 `desktop-v*` tag builds on Linux, Windows and Apple Silicon/Intel macOS runners.
 It builds a standalone source input on Linux, avoiding this workspace's
 Linux-only package overrides on the native Windows/macOS build runners.
-It uploads successful packages and checksums as workflow artifacts, not as
-automatic public releases. Running the workflow needs this repository on GitHub;
-no remote account or runner has been connected from this workspace.
+Pushing a tag matching the app version (for example `desktop-v1.0.2`) builds
+and smoke-checks the packages, then creates a GitHub Release with the Windows
+installer, Linux AppImage, Intel and Apple Silicon macOS DMG/ZIP files, and a
+SHA-256 checksum list. The GitHub Actions workflow needs `contents: write` for
+its release job; this is scoped only to the job that publishes the release.
+Manually starting the workflow builds packages for inspection without
+publishing a GitHub Release. Tag names must exactly match the app's package
+version. macOS builds are ad-hoc signed, not Apple-notarised; the release notes
+warn that Gatekeeper can still block them.
 
 The packaged executable accepts `--smoke-test`: it opens a hidden renderer,
 checks the sandbox bridge and rendered interface, then uses synthetic temporary
