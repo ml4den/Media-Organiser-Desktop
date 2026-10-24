@@ -36,6 +36,7 @@ _Populate as you build — short repo map plus pointers to the source-of-truth f
 - The desktop app is the primary product; browser mode is a useful preview, not a substitute for native filesystem access. **Why:** the user asked for a cross-platform desktop app operating on local media.
 - Browser previews must not upload personal files or pretend to move them. ZIP export provides useful local-only functionality when write permissions are unavailable.
 - Copy + rename is the safe default rather than the original script's Move + forced overwrite. Destructive choices require explicit confirmation.
+- Desktop destructive consent uses one authoritative native prompt, not a renderer prompt followed by a native prompt. **Why:** Ubuntu user testing found the duplicate prompts unnecessary; keeping native enforcement prevents renderer IPC from bypassing consent.
 - Dates remain strict media-metadata dates, not guessed filesystem or filename dates. Structured ExifTool values replace locale-dependent Windows shell date strings.
 
 ## Product

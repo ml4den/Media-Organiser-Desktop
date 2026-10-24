@@ -238,6 +238,7 @@ body{background-image:radial-gradient(900px 400px at 85% -10%,hsl(24 90% 62%/.14
 .btn-ghost{background:hsl(var(--card)/.6)}
 .card{background:hsl(var(--card));border:1px solid hsl(var(--card-border));border-radius:1.25rem;box-shadow:0 1px 0 hsl(0 0% 100%/.6) inset,0 12px 30px -22px hsl(184 55% 20%/.5)}
 .field{width:100%;border:1px solid hsl(var(--input));background:hsl(var(--background)/.6);border-radius:.7rem;padding:.5rem .8rem;font-size:.9rem;outline:none;transition:box-shadow .2s,border-color .2s}
+.field.field-search{padding-left:2.25rem}
 .field:focus{border-color:hsl(var(--ring));box-shadow:0 0 0 3px hsl(var(--ring)/.2)}
 .rise{animation:rise .45s cubic-bezier(.2,.8,.2,1) both}
 @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}

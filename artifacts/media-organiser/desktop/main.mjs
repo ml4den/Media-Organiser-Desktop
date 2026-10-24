@@ -2,6 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain, Menu, session } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { MediaEngine } from "./engine.mjs";
+import { confirmRun } from "./confirmation.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const rendererPath = path.resolve(here, "../dist/public/index.html");
@@ -61,19 +62,7 @@ app.whenReady().then(() => {
     const plan = engine.plans.get(id);
     if (!plan) throw new Error("Scan your media before processing.");
     // Require native confirmation too: IPC cannot bypass destructive consent.
-    if (plan.settings.operation === "move" || plan.settings.conflict === "overwrite") {
-      const result = await dialog.showMessageBox(window, {
-        type: "warning", title: "Confirm file changes",
-        message: "Proceed with the reviewed changes?",
-        detail: [
-          plan.settings.operation === "move" ? "MOVE: Originals will be deleted only after each copy is SHA-256 verified." : "COPY: Original source files will be kept.",
-          plan.settings.conflict === "overwrite" ? "OVERWRITE: Existing destination files with matching names will be permanently replaced. This cannot be undone." : "Existing destination files will not be overwritten.",
-          `Destination: ${plan.destination.path}`,
-        ].join("\n\n"),
-        buttons: ["Cancel", "Organise files"], defaultId: 0, cancelId: 0, noLink: true,
-      });
-      if (result.response !== 1) throw new Error("Operation cancelled. No files were changed.");
-    }
+    await confirmRun(dialog, window, plan);
     return engine.run(id, progress);
   });
   ipcMain.on("media:cancel", (event) => { trusted(event); engine.cancel(); });

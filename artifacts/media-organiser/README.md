@@ -68,6 +68,13 @@ libxkbcommon library path, virtual display, and `--no-sandbox --disable-gpu` for
 the check. Those flags are **test-environment exceptions**, not normal launch
 instructions; default sandbox/FUSE startup on a physical desktop remains unverified.
 
+The user has since reported that the downloaded AppImage starts and works well
+in initial Ubuntu desktop testing, including source selection and Move
+confirmation. The exact Ubuntu release, session type, FUSE versus extraction
+launch method and full cancellation checks were not supplied. This is useful
+user-reported evidence, not certification of both Ubuntu 22.04 and 24.04.
+See [Linux verification notes](desktop/LINUX-VERIFICATION.md).
+
 Third-party notices, licence texts, Perl/libxcrypt source and original runtime
 build recipes are included under `resources/runtime`. Runtime downloads are
 pinned in the desktop manifests and fail closed on checksum mismatch. Electron
@@ -110,6 +117,11 @@ Use the managed preview workflow for the browser interface.
    include subfolders, exclude dot-hidden names and `.trashed`, `temp`, `delete`.
 4. Scan and review: no files are written during scanning.
 5. Run the reviewed plan. Move and Overwrite both require confirmation.
+
+On desktop, a single native confirmation includes the ready-file count,
+destination, whether originals will be removed, conflict behavior and a backup
+warning. Cancel is the default. Selected sources appear in a scrollable list
+with 50 entries per page; full paths are available on hover.
 
 Change sources, destination or settings to discard the old review and scan again.
 Cancel finishes the current file safely before stopping. Summary and activity logs

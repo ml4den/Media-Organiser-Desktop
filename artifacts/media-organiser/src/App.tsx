@@ -7,6 +7,7 @@ import { derivedStatus, download, fmtBytes, loadHistory, loadSettings, logsToTex
 import { Modal, Segmented, Step, Switch } from "@/components/mo/bits";
 import { HistoryView } from "@/components/mo/history";
 import { HelpView } from "@/components/mo/help";
+import { SourceList } from "@/components/mo/source-list";
 import { AlertTriangle, Archive, FileDown, FilePlus2, FolderInput, FolderOpen, FolderTree, Play, Plus, ScanSearch, Search, Sparkles, Square, UploadCloud, X } from "lucide-react";
 
 type View = "organise" | "history" | "help";
@@ -218,15 +219,7 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
           </div>
         </div>
         {sources.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-2" data-testid="list-sources">
-            {sources.map((s) => (
-              <li key={s.id} className="pop flex max-w-full items-center gap-2 rounded-full bg-secondary py-1 pl-3 pr-1.5 text-sm" title={s.path || s.label}>
-                <span className="truncate font-mono text-xs">{s.path || s.label}</span>
-                <button disabled={busy} onClick={() => removeSource(s.id)} aria-label={`Remove ${s.label}`} className="grid h-5 w-5 place-items-center rounded-full hover:bg-foreground/10"><X size={12} /></button>
-              </li>
-            ))}
-            <li><button className="text-xs text-muted-foreground underline" disabled={busy} onClick={() => { setSources([]); invalidate(); }}>Clear all</button></li>
-          </ul>
+          <SourceList sources={sources} busy={busy} onRemove={removeSource} onClear={() => { setSources([]); invalidate(); }} />
         )}
       </Step>
 
@@ -351,8 +344,8 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
                   className={`rounded-full border px-3 py-1 text-xs font-medium capitalize transition-all ${filter === f ? "border-primary bg-primary text-primary-foreground" : "hover:border-primary"}`}>{f.replace("-", " ")} <span className="font-mono opacity-70">{counts[f] || 0}</span></button>
               ))}
             </div>
-            <div className="relative mt-3"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <input className="field pl-9" placeholder="Filter by filename or path" value={q} onChange={(e) => { setQ(e.target.value); setLimit(200); }} data-testid="input-search" /></div>
+            <div className="relative mt-3"><Search size={15} aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <input className="field field-search" aria-label="Filter by filename or path" placeholder="Filter by filename or path" value={q} onChange={(e) => { setQ(e.target.value); setLimit(200); }} data-testid="input-search" /></div>
             <div className="mt-3 max-h-[28rem] overflow-auto rounded-xl border">
               <table className="w-full text-left text-sm">
                 <thead className="sticky top-0 bg-card text-xs text-muted-foreground"><tr><th className="p-2.5">File</th><th className="p-2.5">Date</th><th className="hidden p-2.5 md:table-cell">Goes to</th><th className="p-2.5">Status</th></tr></thead>
@@ -373,7 +366,7 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
             <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl bg-muted/70 p-4">
               <div className="flex-1 text-sm"><b>{readyCount}</b> will be {op === "move" ? "moved" : "copied"}{counts["missing-date"] ? `, ${counts["missing-date"]} need a date` : ""}{counts.excluded ? `, ${counts.excluded} excluded` : ""}.</div>
               <button className={`btn ${op === "move" || settings.conflict === "overwrite" ? "btn-danger" : "btn-warm"}`} disabled={busy || !!plan.demo || readyCount === 0 || !!summary}
-                onClick={() => (needsConfirm ? setConfirm(true) : doRun())} data-testid="button-run">
+                onClick={() => (needsConfirm && !desktop ? setConfirm(true) : doRun())} data-testid="button-run">
                 {zipMode ? <Archive size={16} /> : <Play size={16} />}{runLabel}</button>
             </div>
             {plan.demo && <p className="mt-2 text-xs text-muted-foreground">Examples cannot be run. Add your own sources and scan for a real plan.</p>}
