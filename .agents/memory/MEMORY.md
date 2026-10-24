@@ -1,0 +1,1 @@
+- [Desktop platform testing](desktop-platform-testing.md) — user confirmed the Windows build works; distinguish this from untested macOS packages.

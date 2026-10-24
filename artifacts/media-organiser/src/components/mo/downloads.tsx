@@ -20,11 +20,12 @@ export function Downloads() {
     <p>Ready-to-run packages include the app runtime and metadata tools and work offline. No Node.js, npm, or separate Perl installation.</p>
     {files.map((file) => <div key={file.name} className="rounded-lg border p-3 space-y-2">
       <a className="btn btn-primary inline-flex" href={`${base}${encodeURIComponent(file.name)}`} download>
-        Download {file.os === "linux" ? "Linux AppImage" : file.os === "win" ? (file.name.endsWith(".zip") ? "Windows portable ZIP" : "Windows installer") : "macOS DMG"}
+        Download {file.os === "linux" ? "Linux AppImage" : file.os === "win" ? (file.name.endsWith(".zip") ? "Windows portable ZIP" : "Windows installer") : `macOS ${file.arch === "arm64" ? "Apple Silicon" : "Intel"} ${file.name.endsWith(".zip") ? "ZIP" : "DMG"}`}
       </a>
       <p>Version {file.version} · {file.arch === "x86_64" || file.arch === "x64" ? "Intel / AMD 64-bit" : "ARM64"} · {(file.size / 1024 / 1024).toFixed(0)} MB</p>
-      {file.os === "win" && <p><b>Unsigned test build.</b> Not yet run on Windows. Test with copies of a small folder first, using Copy + Rename.</p>}
+      {file.os === "win" && <p><b>Unsigned build.</b> Reported working on Windows by the user. Test with copies of a small folder first, using Copy + Rename.</p>}
       {file.os === "win" && file.name.endsWith(".zip") && <p>Right-click the ZIP → Extract All. Open the extracted folder and run <b>Media Organiser.exe</b>. Keep all accompanying files and folders together; don’t run the app from inside the ZIP.</p>}
+      {file.os === "mac" && <><p><b>Unsigned, not notarised; not yet run on a Mac.</b> Requires macOS 15+. Test with copies using Copy + Rename.</p><p>Extract the ZIP, drag <b>Media Organiser.app</b> into Applications, then open it. If macOS blocks it, use System Settings → Privacy &amp; Security → Open Anyway only if you trust this download. Don’t disable Gatekeeper globally.</p></>}
       <details><summary className="cursor-pointer">SHA-256 checksum</summary><code className="block break-all text-xs mt-1">{file.sha256}</code></details>
     </div>)}
     {!files.length && <p>{loaded ? "No packaged releases are available in this preview yet." : "Checking available packages…"}</p>}

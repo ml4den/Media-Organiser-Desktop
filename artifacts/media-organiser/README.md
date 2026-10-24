@@ -34,9 +34,16 @@ Extract the entire ZIP and run `Media Organiser.exe` from the extracted folder;
 all accompanying files must remain together. No Node.js, npm, separate Perl or
 installation is needed. Do not run the executable from inside the ZIP.
 Executable resource editing/signing is skipped for Linux-hosted test builds;
-the default icon may be generic. Windows installation and execution still need
-testing on Windows. macOS DMG builds require a native runner and are not available.
-No placeholder download is offered.
+the default icon may be generic. The user has confirmed that the Windows build works.
+
+`pnpm --filter @workspace/media-organiser desktop:package:mac` builds separate
+self-contained Apple Silicon (arm64) and Intel (x64) packages. On Linux these
+are ZIP archives containing a complete `.app`, including the matching macOS
+Electron and pinned portable Perl runtime; DMG creation requires a native Mac.
+Extract the ZIP and drag `Media Organiser.app` to Applications. Builds are unsigned
+and not notarised, and have not been run on a Mac. If blocked, use macOS System
+Settings → Privacy & Security → Open Anyway only for a download you trust.
+Do not disable Gatekeeper globally. Test copies of media with Copy + Rename first.
 Windows requires Windows 10+; bundled macOS Perl requires macOS 15+.
 Unsigned builds may show Windows SmartScreen/macOS Gatekeeper warnings.
 Signing/notarisation credentials are not included or configured.
@@ -52,7 +59,7 @@ test packaging as a portable ZIP without Wine. Native Windows builds retain
 the NSIS installer target; AppImage and DMG/ZIP are the other respective targets.
 
 Output: `generated-artifacts/desktop/` relative to the repository root.
-`desktop:downloads` copies only built AppImage/EXE/DMG packages into the ignored
+`desktop:downloads` copies only built AppImage/EXE/DMG and Windows/macOS ZIP packages into the ignored
 public download area and writes the release manifest and SHA-256 checksums.
 Run it only after checking the release. Then rebuild/export source if needed.
 

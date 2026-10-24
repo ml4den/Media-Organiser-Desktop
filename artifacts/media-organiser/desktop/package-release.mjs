@@ -9,8 +9,11 @@ import { build, Platform, Arch } from "electron-builder";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.resolve(root, "../../generated-artifacts/desktop");
 const windowsTarget = process.argv.includes("--win");
-const targetPlatform = windowsTarget ? "win32" : process.platform;
-const stage = path.join(output, `stage-${targetPlatform}-${process.arch}`);
+const macTarget = process.argv.includes("--mac");
+if (windowsTarget && macTarget) throw new Error("Choose one target platform.");
+const targetPlatform = windowsTarget ? "win32" : macTarget ? "darwin" : process.platform;
+const targetArch = process.argv.includes("--arm64") ? "arm64" : process.argv.includes("--x64") ? "x64" : process.arch;
+const stage = path.join(output, `stage-${targetPlatform}-${targetArch}`);
 const original = JSON.parse(await fs.readFile(path.join(root, "package.json"), "utf8"));
 const require = createRequire(path.join(root, "package.json"));
 await fs.rm(stage, { recursive: true, force: true });
@@ -53,7 +56,7 @@ await fs.writeFile(path.join(stage, "package.json"), JSON.stringify(manifest, nu
 await fs.mkdir(path.join(stage, "runtime"), { recursive: true });
 if (targetPlatform !== "win32") {
   const runtimes = JSON.parse(await fs.readFile(path.join(root, "desktop/perl-runtimes.json"), "utf8"));
-  const asset = runtimes.assets[`${process.platform}-${process.arch}`];
+  const asset = runtimes.assets[`${targetPlatform}-${targetArch}`];
   if (!asset) throw new Error("Unsupported Perl runtime target.");
   const cache = path.resolve(root, "../../generated-artifacts/runtime-cache");
   await fs.mkdir(cache, { recursive: true });
@@ -97,6 +100,7 @@ const unpackedOnly = process.argv.includes("--dir");
 await build({
   projectDir: stage,
   ...(windowsTarget ? { targets: Platform.WINDOWS.createTarget([process.platform === "win32" ? "nsis" : "zip"], Arch.x64) } : {}),
+  ...(macTarget ? { targets: Platform.MAC.createTarget([process.platform === "darwin" ? "dmg" : "zip"], targetArch === "arm64" ? Arch.arm64 : Arch.x64) } : {}),
   config: {
     appId: "com.mediaorganiser.desktop", productName: "Media Organiser",
     electronVersion, directories: { output },

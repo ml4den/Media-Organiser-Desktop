@@ -12,7 +12,7 @@ const candidates = (await fs.readdir(release)).sort((a, b) => b.localeCompare(a,
 const seen = new Set();
 for (const name of candidates) {
   if (!/^Media-Organiser-[\d.]+-(linux|win|mac)-[\w_]+\.(AppImage|exe|dmg|zip)$/.test(name)) continue;
-  if (name.endsWith(".zip") && !name.includes("-win-")) continue;
+  if (name.endsWith(".zip") && !name.includes("-win-") && !name.includes("-mac-")) continue;
   const [, version, os, arch] = name.match(/^Media-Organiser-([\d.]+)-(linux|win|mac)-([\w_]+)\./);
   const key = `${os}-${arch}-${path.extname(name)}`;
   if (seen.has(key)) continue;
