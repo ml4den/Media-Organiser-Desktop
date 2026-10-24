@@ -194,13 +194,14 @@ export const browserMediaService: MediaService = {
     return rememberFiles(fileFallback.map((file) => ({ file, relative: file.name })), `${fileFallback.length} dropped files`);
   },
   async pickDestination() {
-    if (!folderAccess) throw new Error("This browser preview cannot grant local folder write access. You can download an organised ZIP instead, or use the desktop app.");
+    if (!folderAccess) throw new Error("This browser cannot grant local folder write access here. Download an organised ZIP instead, open the site directly in desktop Chrome or Edge, or use the desktop app.");
     try {
       const handle = await fsWindow.showDirectoryPicker!({ mode: "readwrite", id: "media-destination" });
       const key = id(); destinations.set(key, handle);
       return { id: key, label: handle.name };
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return null;
+      if (error instanceof DOMException && ["NotAllowedError", "SecurityError"].includes(error.name)) throw new Error("Folder permission was denied. Choose an allowed destination folder, or use ZIP output without folder access.");
       throw error;
     }
   },

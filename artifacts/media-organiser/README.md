@@ -6,8 +6,9 @@ No account, upload, cloud service or database is needed.
 
 ## Ready-to-run downloads
 
-Open **Help → Desktop downloads** in the browser preview. Only packages actually
-built and placed in the release area are offered. The Linux x86-64 AppImage
+Open **Help → Desktop downloads** in the web app, or visit
+[the latest GitHub Release](https://github.com/ml4den/Media-Organiser-Desktop/releases/latest).
+Only published packages are offered. The Linux x86-64 AppImage
 includes Electron, local fonts, ExifTool, and a private relocatable Perl runtime.
 No Node.js, npm, separate Perl installation, internet connection or account is
 needed to run it. Checksums are supplied alongside the download.
@@ -204,9 +205,49 @@ has not changed. Existing destination symlinks and overlapping source/destinatio
 folders are rejected. Files changed since preview produce errors rather than
 being processed blindly. Keep an independent backup: there is no undo.
 
-### Browser preview
+### Web app on GitHub Pages
 
-The preview uses the same renderer with browser-local processing. No media is
+Public website: **https://ml4den.github.io/Media-Organiser-Desktop/**
+
+This is the functional organiser, not just a desktop download page. GitHub Pages
+serves static HTML, JavaScript, CSS and local fonts. No API server, database,
+account, media upload or paid backend is needed. Website requests go to GitHub
+Pages; desktop download links go to GitHub Releases. Media processing stays on
+the user's device.
+
+`.github/workflows/pages.yml` deploys the main branch using GitHub's official
+Pages artifact/deployment actions. It runs on main pushes, manual dispatch and
+successful completion of **Desktop packages**, refreshing static release metadata
+after releases created with `GITHUB_TOKEN` (which do not trigger another
+`release` event). Failed desktop builds do not trigger deployment.
+
+Repository setup: **Settings → Pages → Build and deployment → Source: GitHub
+Actions**. The `github-pages` environment must permit main-branch deployment.
+The workflow scopes Pages read access to the build and Pages write/OIDC access
+to deployment; it does not need repository write access.
+
+To reproduce the production static build:
+
+```sh
+pnpm install --frozen-lockfile
+pnpm --filter @workspace/media-organiser web:test
+BASE_PATH=/Media-Organiser-Desktop/ pnpm --filter @workspace/media-organiser web:build
+```
+
+Output is `artifacts/media-organiser/dist/public/`. The Pages builder explicitly
+excludes the ignored installer/source downloads in `public/`; it only adds the
+favicon, robots file and small static release manifest. Do not upload desktop
+installers to Pages. Release metadata is fetched at build time with optional
+CI `GH_TOKEN`; it is never embedded in the browser. If GitHub metadata is
+unavailable, the app still builds and Help links to the latest Release page.
+Visitors do not make GitHub API requests. The browser has no processing API.
+
+The organiser uses in-page navigation, so refreshing the root or opening
+`?view=help` needs no server-side routing rules. Keep the trailing slash on the
+repository base path. The local managed preview and desktop file-URL build keep
+their existing separate configurations.
+
+The web app uses the same renderer with browser-local processing. No media is
 uploaded. It supports EXIF image dates and MP4/MOV container dates; desktop has
 broader metadata support. Browser mode is **copy-only**.
 

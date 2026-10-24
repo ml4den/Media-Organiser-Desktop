@@ -38,8 +38,8 @@ function Shell() {
             </button>
           ))}
         </nav>
-        <span className={`tone ${desktop ? "tone-ready" : "tone-skipped"}`} data-testid="badge-mode" title={desktop ? "Native folders, files never leave this computer" : "Copy only; a ZIP is downloaded"}>
-          {desktop ? "Desktop \u00b7 Local only" : "Browser preview"}
+        <span className={`tone ${desktop ? "tone-ready" : "tone-skipped"}`} data-testid="badge-mode" title={desktop ? "Native folders, files never leave this computer" : "Local processing · Copy only · Folder or ZIP output"}>
+          {desktop ? "Desktop \u00b7 Local only" : "Web app · Local only"}
         </span>
       </header>
       <main>
@@ -197,7 +197,8 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
     <div className="space-y-5">
       {!desktop && (
         <p className="rise rounded-xl bg-[hsl(var(--accent)/.16)] px-4 py-3 text-sm" data-testid="text-browser-note">
-          You are in the browser preview: files are copied only, and your originals are never changed. The desktop app has native folder access and supports Move.
+          <b>Private browser processing.</b> Your media is never uploaded. Copy to a permitted folder or download an organised ZIP (512 MB maximum per batch). Move is desktop-only.
+          <span className="mt-1 block text-xs">Folder saving works in compatible desktop browsers such as Chrome and Edge. Metadata support is narrower than desktop; browser copies do not have desktop-level disk verification. Use desktop for large or valuable archives.</span>
         </p>
       )}
       {error && (
@@ -229,7 +230,7 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
             <p className="text-xs text-muted-foreground">Destination</p>
             <p className={`truncate font-mono text-sm ${dest || zipMode ? "" : "text-muted-foreground"}`} data-testid="text-destination">{destText}</p>
           </div>
-          <button className="btn btn-primary" disabled={busy} onClick={pickDest} data-testid="button-pick-destination"><FolderOpen size={16} />{dest ? "Change" : "Choose folder"}</button>
+          <button className="btn btn-primary" disabled={busy || (!desktop && !mediaService.canWriteFolders)} title={!desktop && !mediaService.canWriteFolders ? "Folder writing is unavailable here. Use the organised ZIP download instead." : undefined} onClick={pickDest} data-testid="button-pick-destination"><FolderOpen size={16} />{dest ? "Change" : "Choose folder"}</button>
           {dest && !desktop && <button className="btn btn-ghost" disabled={busy} onClick={clearDest}>Use ZIP</button>}
         </div>
         {zipMode && <p className="mt-2 text-xs text-muted-foreground">{mediaService.canWriteFolders ? "Pick a folder to write directly, or leave it and download a ZIP." : "This browser cannot write to folders, so the result is downloaded as a ZIP that keeps your structure."}</p>}
@@ -253,7 +254,7 @@ function Organise({ addRun }: { addRun: (s: RunSummary) => void }) {
             <div>
               <p className="mb-1.5 text-sm font-medium">Action</p>
               <Segmented id="op" value={op} onChange={(v) => patch({ operation: v })} options={[{ v: "copy", label: "Copy" }, { v: "move", label: "Move", disabled: !desktop }]} />
-              <p className="mt-1 text-xs text-muted-foreground">{desktop ? (op === "move" ? "Originals are removed after they are placed." : "Originals stay where they are.") : "Move is unavailable in a browser, which cannot remove your originals. Use the desktop app."}</p>
+              <p className="mt-1 text-xs text-muted-foreground">{desktop ? (op === "move" ? "Originals are removed after they are placed." : "Originals stay where they are.") : "This web app only copies and never deletes originals. Use the desktop app for Move."}</p>
             </div>
             <div>
               <p className="mb-1.5 text-sm font-medium">If a file already exists</p>

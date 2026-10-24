@@ -1,0 +1,62 @@
+name: Browser app on GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # Releases created with GITHUB_TOKEN do not trigger a separate release event.
+  workflow_run:
+    workflows: ["Desktop packages"]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      # workflow_run never checks out another run's possibly untrusted code.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@v5
+      - run: pnpm --filter @workspace/media-organiser web:test
+      - run: pnpm --filter @workspace/media-organiser typecheck
+      - name: Build static browser app and release metadata
+        run: pnpm --filter @workspace/media-organiser web:build
+        env:
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          GH_TOKEN: ${{ github.token }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: artifacts/media-organiser/dist/public
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish browser app
+        id: deployment
+        uses: actions/deploy-pages@v4

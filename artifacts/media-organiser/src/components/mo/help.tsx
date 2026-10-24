@@ -8,14 +8,15 @@ export function HelpView() {
   return (
     <div className="space-y-4 rise">
       <h1 className="font-display text-3xl">Help</h1>
-      <p className="text-sm text-muted-foreground">You are using the {mediaService.desktop ? "desktop app." : "browser preview."}</p>
+      <p className="text-sm text-muted-foreground">You are using the {mediaService.desktop ? "desktop app." : "web app. All media processing stays on your device."}</p>
       <div className="grid gap-4 md:grid-cols-2">
         <Block t="Desktop vs. browser">
           <p><b>Desktop</b> has native folder access: it reads real paths, writes straight into your destination folder, and can move files.</p>
-          <p><b>Browser preview</b> can only copy. Browsers do not let a page delete your originals, so Move is disabled. Without a writable destination folder, the run produces a downloadable ZIP that keeps your folder structure.</p>
+          <p><b>Web app</b> is copy-only and never deletes originals. In compatible desktop Chrome or Edge, open the site directly and grant folder permission to save copies to a destination. Other browsers can use a downloadable ZIP that keeps your folder structure.</p>
+          <p>Cancel a folder picker to leave the current selection unchanged. If permission is denied, try an allowed folder or leave the destination empty for ZIP output. Selected files and folder permissions must be chosen again after a reload.</p>
         </Block>
         <Block t="Your files stay yours">
-          <p>Nothing is uploaded. Scanning and processing happen on this machine, and there is no account or network call.</p>
+          <p>Your media is never uploaded. Scanning and processing happen on this machine, with no account or processing server. The website and download information are loaded over the network; choosing a desktop download opens GitHub.</p>
           <p>Scanning never writes. Only the reviewed plan is executed, and changing any setting, source or destination discards that plan so you review again.</p>
         </Block>
         <Block t="Date strictness">
@@ -33,6 +34,7 @@ export function HelpView() {
         <Block t="Safe copying and larger archives">
           <p>The desktop app verifies copies using SHA-256 before removing a source in Move mode. Keep a separate backup; Move and Overwrite cannot be undone here.</p>
           <p>The browser ZIP export is limited to 512 MB per batch. Desktop processing streams files and is intended for larger archives. Cancellation finishes the current file safely before stopping.</p>
+          <p>Browser folder writes do not provide desktop-level atomic creation or SHA-256 disk verification. Use a separate destination and keep backups; use desktop for valuable archives or large batches. If cancelled, a ZIP can contain the files already processed; review the summary before using it.</p>
           <p>Capture dates keep the calendar date stored in metadata. Browser video support covers MP4/MOV container timestamps; the desktop app uses ExifTool for broader format support. Hidden means dot-prefixed names; Windows hidden attributes are not read.</p>
         </Block>
       </div>
