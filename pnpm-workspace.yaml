@@ -68,6 +68,15 @@ catalog:
 
 autoInstallPeers: false
 
+# Keep the Windows-only ExifTool runtime available for desktop cross-packaging.
+# This does not change the host platform used to run workspace build tools.
+supportedArchitectures:
+  os:
+    - current
+    - win32
+  cpu:
+    - current
+
 onlyBuiltDependencies:
   - '@swc/core'
   - esbuild

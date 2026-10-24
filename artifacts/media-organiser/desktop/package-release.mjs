@@ -4,11 +4,13 @@ import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { build } from "electron-builder";
+import { build, Platform, Arch } from "electron-builder";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.resolve(root, "../../generated-artifacts/desktop");
-const stage = path.join(output, `stage-${process.platform}-${process.arch}`);
+const windowsTarget = process.argv.includes("--win");
+const targetPlatform = windowsTarget ? "win32" : process.platform;
+const stage = path.join(output, `stage-${targetPlatform}-${process.arch}`);
 const original = JSON.parse(await fs.readFile(path.join(root, "package.json"), "utf8"));
 const require = createRequire(path.join(root, "package.json"));
 await fs.rm(stage, { recursive: true, force: true });
@@ -35,8 +37,8 @@ async function copyDependency(name, resolver, destination) {
   const childRequire = createRequire(path.join(source, "package.json"));
   for (const dep of Object.keys(manifest.dependencies ?? {})) await copyDependency(dep, childRequire, target);
   for (const dep of Object.keys(manifest.optionalDependencies ?? {})) {
-    if (dep === "exiftool-vendored.exe" && process.platform !== "win32") continue;
-    if (dep === "exiftool-vendored.pl" && process.platform === "win32") continue;
+    if (dep === "exiftool-vendored.exe" && targetPlatform !== "win32") continue;
+    if (dep === "exiftool-vendored.pl" && targetPlatform === "win32") continue;
     // Required runtime optional dependencies must fail the build if missing.
     await copyDependency(dep, childRequire, target);
   }
@@ -49,7 +51,7 @@ const manifest = {
 };
 await fs.writeFile(path.join(stage, "package.json"), JSON.stringify(manifest, null, 2));
 await fs.mkdir(path.join(stage, "runtime"), { recursive: true });
-if (process.platform !== "win32") {
+if (targetPlatform !== "win32") {
   const runtimes = JSON.parse(await fs.readFile(path.join(root, "desktop/perl-runtimes.json"), "utf8"));
   const asset = runtimes.assets[`${process.platform}-${process.arch}`];
   if (!asset) throw new Error("Unsupported Perl runtime target.");
@@ -94,6 +96,7 @@ const electronVersion = require("electron/package.json").version;
 const unpackedOnly = process.argv.includes("--dir");
 await build({
   projectDir: stage,
+  ...(windowsTarget ? { targets: Platform.WINDOWS.createTarget([process.platform === "win32" ? "nsis" : "zip"], Arch.x64) } : {}),
   config: {
     appId: "com.mediaorganiser.desktop", productName: "Media Organiser",
     electronVersion, directories: { output },
@@ -103,7 +106,12 @@ await build({
     npmRebuild: false,
     artifactName: "Media-Organiser-${version}-${os}-${arch}.${ext}",
     mac: { category: "public.app-category.photography", minimumSystemVersion: "15.0", target: ["dmg", "zip"], identity: null },
-    win: { target: ["nsis"] }, nsis: { oneClick: false, allowToChangeInstallationDirectory: true },
+    win: {
+      target: ["nsis"],
+      // Unsigned portable test ZIPs can be produced on Linux without Wine. Native
+      // release builds retain normal executable resource editing/signing support.
+      ...(windowsTarget && process.platform !== "win32" ? { signAndEditExecutable: false } : {}),
+    }, nsis: { oneClick: false, allowToChangeInstallationDirectory: true },
     linux: { category: "Photography", target: ["AppImage"], executableName: "media-organiser" },
     ...(unpackedOnly ? { targets: [] } : {}),
   },

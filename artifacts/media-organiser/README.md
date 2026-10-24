@@ -27,8 +27,16 @@ Use a normal graphical user session, not root. If local security policy blocks
 Chromium's sandbox/user namespaces, use an administrator-approved policy for
 this application; do not disable the sandbox as a normal installation step.
 
-Windows NSIS and macOS DMG builds are configured but have **not been produced or
-verified in this Linux environment**. No placeholder download is offered.
+Self-contained Windows portable ZIP builds can be cross-packaged on Linux for testing using
+`pnpm --filter @workspace/media-organiser desktop:package:win`. This explicitly
+selects the Windows Electron distribution and bundled ExifTool/Perl runtime.
+Extract the entire ZIP and run `Media Organiser.exe` from the extracted folder;
+all accompanying files must remain together. No Node.js, npm, separate Perl or
+installation is needed. Do not run the executable from inside the ZIP.
+Executable resource editing/signing is skipped for Linux-hosted test builds;
+the default icon may be generic. Windows installation and execution still need
+testing on Windows. macOS DMG builds require a native runner and are not available.
+No placeholder download is offered.
 Windows requires Windows 10+; bundled macOS Perl requires macOS 15+.
 Unsigned builds may show Windows SmartScreen/macOS Gatekeeper warnings.
 Signing/notarisation credentials are not included or configured.
@@ -38,8 +46,10 @@ Signing/notarisation credentials are not included or configured.
 `desktop:package` builds the interface, materialises only the lockfile-resolved
 runtime dependency tree (no workspace links), downloads a pinned and SHA-256
 checked portable Perl on Unix, and invokes Electron Builder. Windows uses
-ExifTool's own bundled Windows runtime. Compiling must target the build machine's
-OS and architecture. AppImage, NSIS, and DMG/ZIP are the respective targets.
+ExifTool's own bundled Windows runtime. Native builds target the build machine's
+OS and architecture; `desktop:package:win` also supports Linux → Windows x64
+test packaging as a portable ZIP without Wine. Native Windows builds retain
+the NSIS installer target; AppImage and DMG/ZIP are the other respective targets.
 
 Output: `generated-artifacts/desktop/` relative to the repository root.
 `desktop:downloads` copies only built AppImage/EXE/DMG packages into the ignored

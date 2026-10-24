@@ -8,10 +8,16 @@ const release = path.resolve(process.argv[2] ?? path.join(root, "../../generated
 const destination = path.join(root, "public/downloads");
 await fs.mkdir(destination, { recursive: true });
 const files = [];
-for (const name of await fs.readdir(release)) {
-  if (!/^Media-Organiser-[\d.]+-(linux|win|mac)-[\w_]+\.(AppImage|exe|dmg)$/.test(name)) continue;
-  const bytes = await fs.readFile(path.join(release, name));
+const candidates = (await fs.readdir(release)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+const seen = new Set();
+for (const name of candidates) {
+  if (!/^Media-Organiser-[\d.]+-(linux|win|mac)-[\w_]+\.(AppImage|exe|dmg|zip)$/.test(name)) continue;
+  if (name.endsWith(".zip") && !name.includes("-win-")) continue;
   const [, version, os, arch] = name.match(/^Media-Organiser-([\d.]+)-(linux|win|mac)-([\w_]+)\./);
+  const key = `${os}-${arch}-${path.extname(name)}`;
+  if (seen.has(key)) continue;
+  seen.add(key);
+  const bytes = await fs.readFile(path.join(release, name));
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   await fs.writeFile(path.join(destination, name), bytes);
   files.push({ name, version, os, arch, size: bytes.length, sha256 });

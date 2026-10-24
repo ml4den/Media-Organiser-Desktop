@@ -20,9 +20,11 @@ export function Downloads() {
     <p>Ready-to-run packages include the app runtime and metadata tools and work offline. No Node.js, npm, or separate Perl installation.</p>
     {files.map((file) => <div key={file.name} className="rounded-lg border p-3 space-y-2">
       <a className="btn btn-primary inline-flex" href={`${base}${encodeURIComponent(file.name)}`} download>
-        Download {file.os === "linux" ? "Linux AppImage" : file.os === "win" ? "Windows installer" : "macOS DMG"}
+        Download {file.os === "linux" ? "Linux AppImage" : file.os === "win" ? (file.name.endsWith(".zip") ? "Windows portable ZIP" : "Windows installer") : "macOS DMG"}
       </a>
       <p>Version {file.version} · {file.arch === "x86_64" || file.arch === "x64" ? "Intel / AMD 64-bit" : "ARM64"} · {(file.size / 1024 / 1024).toFixed(0)} MB</p>
+      {file.os === "win" && <p><b>Unsigned test build.</b> Not yet run on Windows. Test with copies of a small folder first, using Copy + Rename.</p>}
+      {file.os === "win" && file.name.endsWith(".zip") && <p>Right-click the ZIP → Extract All. Open the extracted folder and run <b>Media Organiser.exe</b>. Keep all accompanying files and folders together; don’t run the app from inside the ZIP.</p>}
       <details><summary className="cursor-pointer">SHA-256 checksum</summary><code className="block break-all text-xs mt-1">{file.sha256}</code></details>
     </div>)}
     {!files.length && <p>{loaded ? "No packaged releases are available in this preview yet." : "Checking available packages…"}</p>}

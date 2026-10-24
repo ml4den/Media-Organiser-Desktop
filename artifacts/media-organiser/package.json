@@ -15,7 +15,8 @@
     "desktop:start": "pnpm run desktop:build && electron .",
     "desktop:package": "pnpm run desktop:build && node desktop/package-release.mjs",
     "desktop:export": "node desktop/export-bundle.mjs",
-    "desktop:downloads": "node desktop/publish-downloads.mjs"
+    "desktop:downloads": "node desktop/publish-downloads.mjs",
+    "desktop:package:win": "pnpm run desktop:build && node desktop/package-release.mjs --win"
   },
   "devDependencies": {
     "@fontsource/dm-sans": "^5.3.0",
