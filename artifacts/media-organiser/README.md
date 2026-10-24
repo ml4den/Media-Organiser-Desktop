@@ -4,40 +4,82 @@ A private desktop app for organising photos and videos by dates stored in their
 metadata. Windows, macOS and Linux are supported by the Electron application.
 No account, upload, cloud service or database is needed.
 
-## Run the downloaded desktop project
+## Ready-to-run downloads
 
-The ZIP includes the built interface, full source, and Electron shell. It is a
-desktop **project**, not a signed, ready-to-install operating-system installer.
+Open **Help → Desktop downloads** in the browser preview. Only packages actually
+built and placed in the release area are offered. The Linux x86-64 AppImage
+includes Electron, local fonts, ExifTool, and a private relocatable Perl runtime.
+No Node.js, npm, separate Perl installation, internet connection or account is
+needed to run it. Checksums are supplied alongside the download.
 
-1. Install Node.js 22 or newer.
-2. Extract the ZIP and open a terminal in the `Media-Organiser` folder.
-3. Run `npm install`.
-4. Run `npm start`.
+Linux baseline: an x86-64 graphical desktop, glibc 2.31+ and Electron's standard
+desktop libraries (GTK3, NSS, ALSA, libgbm, libxkbcommon and X11/Wayland support).
+Ubuntu 22.04/24.04 are intended targets; this is not a promise of compatibility
+with every distribution. AppImages bundle application dependencies, not the OS.
 
-On Windows, `Start Media Organiser.cmd` performs steps 3–4. On macOS/Linux, run
-`sh "Start Media Organiser.command"` from the extracted folder if preferred.
-The first installation downloads Electron and ExifTool; after installation,
-the desktop app works offline. Fonts are bundled.
+1. Download the AppImage and optionally compare `sha256sum` with `SHA256SUMS.txt`.
+2. In file properties, allow executing the file as a program, then open it.
+3. Alternatively: `chmod +x Media-Organiser-*.AppImage` and run the file.
+4. Without FUSE, run `./Media-Organiser-*.AppImage --appimage-extract`, then
+   `./squashfs-root/AppRun`. Extraction uses only the contents of the AppImage.
 
-On macOS and Linux, ExifTool needs Perl available on PATH (`perl -v`). On Windows,
-ExifTool's runtime is bundled automatically. Linux also needs the standard GUI
-libraries required by Electron; run from a graphical desktop session.
+Use a normal graphical user session, not root. If local security policy blocks
+Chromium's sandbox/user namespaces, use an administrator-approved policy for
+this application; do not disable the sandbox as a normal installation step.
 
-### Build an installer
+Windows NSIS and macOS DMG builds are configured but have **not been produced or
+verified in this Linux environment**. No placeholder download is offered.
+Windows requires Windows 10+; bundled macOS Perl requires macOS 15+.
+Unsigned builds may show Windows SmartScreen/macOS Gatekeeper warnings.
+Signing/notarisation credentials are not included or configured.
 
-From the extracted folder, run `npm run package`. Output is in `release/`:
+## Packaging and verification
 
-- Windows: NSIS setup executable.
-- macOS: DMG and ZIP.
-- Linux: AppImage and DEB.
+`desktop:package` builds the interface, materialises only the lockfile-resolved
+runtime dependency tree (no workspace links), downloads a pinned and SHA-256
+checked portable Perl on Unix, and invokes Electron Builder. Windows uses
+ExifTool's own bundled Windows runtime. Compiling must target the build machine's
+OS and architecture. AppImage, NSIS, and DMG/ZIP are the respective targets.
 
-Build on the operating system you intend to distribute to. Builds are unsigned;
-public distribution requires your own platform signing/notarisation setup.
-Windows and macOS installers have not been built or launched in this Linux
-development environment.
+Output: `generated-artifacts/desktop/` relative to the repository root.
+`desktop:downloads` copies only built AppImage/EXE/DMG packages into the ignored
+public download area and writes the release manifest and SHA-256 checksums.
+Run it only after checking the release. Then rebuild/export source if needed.
 
-The renderer is prebuilt. After changing source, run `npm run build` before
-starting or packaging the app.
+`.github/workflows/desktop-release.yml` provides manually triggered and
+`desktop-v*` tag builds on Linux, Windows and Apple Silicon/Intel macOS runners.
+It builds a standalone source input on Linux, avoiding this workspace's
+Linux-only package overrides on the native Windows/macOS build runners.
+It uploads successful packages and checksums as workflow artifacts, not as
+automatic public releases. Running the workflow needs this repository on GitHub;
+no remote account or runner has been connected from this workspace.
+
+The packaged executable accepts `--smoke-test`: it opens a hidden renderer,
+checks the sandbox bridge and rendered interface, then uses synthetic temporary
+images to verify bundled ExifTool, strict date skipping, read-only scans,
+SHA-256 copying, collision renaming, and Move source deletion only after a
+verified copy. Its temporary directory is cleaned up. Native picker interaction,
+installer UI, and physical desktop integration still require a target-OS check.
+
+Current local verification: Linux x86-64 renderer and processing checks passed
+from extracted packaged resources with PATH excluding all system commands, so
+no system Node.js or Perl was used. This headless container requires a supplied
+libxkbcommon library path, virtual display, and `--no-sandbox --disable-gpu` for
+the check. Those flags are **test-environment exceptions**, not normal launch
+instructions; default sandbox/FUSE startup on a physical desktop remains unverified.
+
+Third-party notices, licence texts, Perl/libxcrypt source and original runtime
+build recipes are included under `resources/runtime`. Runtime downloads are
+pinned in the desktop manifests and fail closed on checksum mismatch. Electron
+also includes its upstream licences. Bundled Perl can be rebuilt/replaced.
+
+### Optional developer source ZIP
+
+The secondary source ZIP is **not** an installer. Developers need Node.js 22+
+and `npm install`, then `npm start`. Development launches on Unix can use system
+Perl; packaged launches always use the included runtime. To rebuild the interface
+use `npm run build`; to package use `npm run package`. Source builds download
+development dependencies; end users of the AppImage do not.
 
 ## Working in the original pnpm repository
 
@@ -47,6 +89,7 @@ From the repository root:
 pnpm install
 pnpm --filter @workspace/media-organiser desktop:start
 pnpm --filter @workspace/media-organiser desktop:package
+pnpm --filter @workspace/media-organiser desktop:downloads
 ```
 
 The repository's installer output is `generated-artifacts/desktop/`.

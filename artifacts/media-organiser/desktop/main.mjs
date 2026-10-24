@@ -17,7 +17,7 @@ function handle(name, callback) {
 function createWindow() {
   window = new BrowserWindow({
     title: "Media Organiser", width: 1240, height: 920, minWidth: 860, minHeight: 640,
-    backgroundColor: "#eef3f0",
+    backgroundColor: "#eef3f0", show: !process.argv.includes("--smoke-test"),
     webPreferences: { preload: path.join(here, "preload.cjs"), nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true },
   });
   window.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
@@ -28,10 +28,10 @@ function createWindow() {
       dialog.showMessageBox(window, { type: "info", title: "Operation in progress", message: "Cancel the operation and wait for the current file to finish before closing.", buttons: ["OK"] });
     }
   });
-  window.loadFile(rendererPath);
+  return window.loadFile(rendererPath);
 }
 app.whenReady().then(() => {
-  engine = new MediaEngine();
+  engine = new MediaEngine({ resourcesPath: app.isPackaged ? process.resourcesPath : undefined });
   // No renderer network access: files and metadata never leave this computer.
   session.defaultSession.webRequest.onBeforeRequest({ urls: ["http://*/*", "https://*/*", "ws://*/*", "wss://*/*"] }, (_details, callback) => callback({ cancel: true }));
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
@@ -77,7 +77,15 @@ app.whenReady().then(() => {
     return engine.run(id, progress);
   });
   ipcMain.on("media:cancel", (event) => { trusted(event); engine.cancel(); });
-  createWindow();
+  const loaded = createWindow();
+  if (process.argv.includes("--smoke-test")) {
+    loaded.then(async () => {
+      const { smokeTest } = await import("./smoke-test.mjs");
+      const report = await smokeTest(app.isPackaged ? process.resourcesPath : undefined, window);
+      console.log("MEDIA_SMOKE_RESULT=" + JSON.stringify(report));
+      app.quit();
+    }).catch((error) => { console.error(error); app.exit(1); });
+  }
   app.on("activate", () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });
 });
 app.on("window-all-closed", () => { if (process.platform !== "darwin") app.quit(); });

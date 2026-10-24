@@ -9,7 +9,7 @@ const prefix = "Media-Organiser/";
 async function collect(dir, filter = () => true) {
   for (const file of await fs.readdir(path.join(root, dir), { withFileTypes: true })) {
     const relative = `${dir}/${file.name}`;
-    if (!filter(relative)) continue;
+    if (file.name === "downloads" || !filter(relative)) continue;
     if (file.isDirectory()) await collect(relative, filter);
     else bundle[prefix + relative] = new Uint8Array(await fs.readFile(path.join(root, relative)));
   }
@@ -33,7 +33,7 @@ const manifest = {
   scripts: {
     start: "electron .",
     build: "vite build",
-    package: "electron-builder --config electron-builder.yml",
+    package: "node desktop/package-release.mjs",
   },
   dependencies: await versions(runtime),
   devDependencies: await versions(dev),

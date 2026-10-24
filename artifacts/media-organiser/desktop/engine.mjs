@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import { createReadStream, constants } from "node:fs";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
-import { ExifTool } from "exiftool-vendored";
+import { createMetadataTool } from "./metadata-runtime.mjs";
 import { dateString, exclusionReason, formatFolder, mediaKind, numberedName, parseMetadataDate, validateSettings } from "../shared/rules.mjs";
 
 const PHOTO_FIELDS = ["DateTimeOriginal", "ModifyDate", "CreateDate"];
@@ -30,7 +30,7 @@ export class MediaEngine {
   tool;
   constructor(options = {}) {
     // All metadata processing is local; ExifTool replaces Windows COM APIs.
-    this.tool = options.tool ?? new ExifTool({ maxProcs: 2, taskTimeoutMillis: 20000 });
+    this.tool = options.tool ?? createMetadataTool(options.resourcesPath);
   }
   async addSources(paths) {
     const result = [];

@@ -1,0 +1,9 @@
+{
+  "version": "5.44.0.0",
+  "assets": {
+    "linux-x64": { "name": "perl-linux-amd64.tar.gz", "sha256": "99fa984bab4eb536dae9630d5d47f3f5bd23a71c361d94dc6ef3a68a7186dcb0" },
+    "linux-arm64": { "name": "perl-linux-arm64.tar.gz", "sha256": "b1a3aa7be1ea0239a29e503b63a52a694371670d4dc535c716d9a16ea2aaa453" },
+    "darwin-x64": { "name": "perl-darwin-amd64.tar.gz", "sha256": "1898662f3526d87e666fc9000a6ce8ef6d8a81fcc072c998eafae8004389619b" },
+    "darwin-arm64": { "name": "perl-darwin-arm64.tar.gz", "sha256": "213733e18662720a3d25fd6e1adeddd05f56ce50b5e1f8bc6bd194e3f43e44d2" }
+  }
+}

@@ -5,7 +5,8 @@ A local-first cross-platform desktop utility based on the user's PowerShell medi
 ## Run & Operate
 
 - `pnpm --filter @workspace/media-organiser desktop:start` — build the renderer and launch Electron locally on a graphical desktop
-- `pnpm --filter @workspace/media-organiser desktop:package` — build platform installers on the target OS
+- `pnpm --filter @workspace/media-organiser desktop:package` — build self-contained packages on the target OS
+- `pnpm --filter @workspace/media-organiser desktop:downloads` — expose checked packages with checksums in the download area
 - `pnpm --filter @workspace/media-organiser desktop:build` then `desktop:export` — refresh the downloadable desktop project ZIP
 - Preview workflow: `artifacts/media-organiser: web`
 - Desktop documentation: `artifacts/media-organiser/README.md`
@@ -45,6 +46,7 @@ _Describe the high-level user-facing capabilities of this app once they exist._
 
 - The user values customisable processing and personally prefers `YYYY/MM/media-files-here`, while wanting other users to be able to choose a custom folder hierarchy.
 - Keep the app simple and intuitive, with source/destination selection and drag-and-drop files and folders.
+- Downloads must be self-contained packages with all application dependencies included, not source projects requiring users to install development tools. **Why:** the user explicitly requested this.
 
 ## Gotchas
 

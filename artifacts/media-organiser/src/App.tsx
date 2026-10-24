@@ -17,7 +17,7 @@ const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e || "So
 const nowLog = (level: ActivityLog["level"], message: string): ActivityLog => ({ time: new Date().toISOString(), level, message });
 
 function Shell() {
-  const [view, setView] = useState<View>("organise");
+  const [view, setView] = useState<View>(() => new URLSearchParams(window.location.search).get("view") === "help" ? "help" : "organise");
   const [history, setHistory] = useState<RunSummary[]>(loadHistory);
   const addRun = (s: RunSummary) => setHistory((h) => { const n = [s, ...h]; saveHistory(n); return n; });
   const clear = () => { setHistory([]); saveHistory([]); };

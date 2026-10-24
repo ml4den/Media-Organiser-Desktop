@@ -1,4 +1,5 @@
 import { mediaService } from "@/lib/media";
+import { Downloads } from "./downloads";
 
 const Block = ({ t, children }: { t: string; children: React.ReactNode }) => (
   <section className="card p-5"><h2 className="font-display text-xl mb-2">{t}</h2><div className="space-y-2 text-sm leading-relaxed text-foreground/85">{children}</div></section>
@@ -26,12 +27,8 @@ export function HelpView() {
           <p>Conflicts: <b>Rename</b> keeps both, <b>Skip</b> leaves the existing file, <b>Overwrite</b> replaces existing files permanently.</p>
           <p>Exclusions match a substring in the file or folder path. Wildcards such as <code className="font-mono">*.tmp</code> work too.</p>
         </Block>
-        <Block t="Build and run the desktop app">
-          {!mediaService.desktop && <p><a href={`${import.meta.env.BASE_URL}Media-Organiser-Desktop.zip`} download className="btn btn-primary inline-flex">Download desktop project (.zip)</a></p>}
-          <p>The desktop project runs locally on Windows, macOS and Linux. It includes the built interface and application source, not a pre-signed installer.</p>
-          <p>Unzip it, install Node.js 22 or newer, then open a terminal in that folder and run <code className="font-mono">npm install</code> followed by <code className="font-mono">npm start</code>. On Linux and macOS, Perl must be available for ExifTool.</p>
-          <p>To create an installer for your current platform, run <code className="font-mono">npm run package</code>. Windows produces a setup executable, macOS a DMG, and Linux an AppImage and DEB. These builds are unsigned.</p>
-          <p>In the original repository: <code className="font-mono">pnpm --filter @workspace/media-organiser desktop:start</code> or <code className="font-mono">pnpm --filter @workspace/media-organiser desktop:package</code>.</p>
+        <Block t="Desktop downloads">
+          <Downloads />
         </Block>
         <Block t="Safe copying and larger archives">
           <p>The desktop app verifies copies using SHA-256 before removing a source in Move mode. Keep a separate backup; Move and Overwrite cannot be undone here.</p>

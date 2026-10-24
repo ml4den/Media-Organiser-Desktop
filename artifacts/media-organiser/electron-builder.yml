@@ -8,12 +8,18 @@ files:
   - shared/**/*
   - dist/public/**/*
   - "!dist/public/Media-Organiser-Desktop.zip"
+  - "!dist/public/downloads/**/*"
   - package.json
+extraResources:
+  - from: runtime
+    to: runtime
 asar: true
 asarUnpack:
   - node_modules/exiftool-vendored*/**/*
+  - "**/node_modules/exiftool-vendored*/**/*"
 npmRebuild: false
 mac:
+  minimumSystemVersion: "15.0"
   category: public.app-category.photography
   target:
     - dmg
@@ -28,4 +34,3 @@ linux:
   category: Photography
   target:
     - AppImage
-    - deb

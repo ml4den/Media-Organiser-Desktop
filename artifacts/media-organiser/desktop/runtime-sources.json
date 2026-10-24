@@ -1,0 +1,5 @@
+[
+  { "name": "perl-source.tar.gz", "url": "https://www.cpan.org/src/5.0/perl-5.44.0.tar.gz", "sha256": "3b855066b92491cb40e86affb1ca57d1a388aa43e51b91c7806a32c2f65f96c3" },
+  { "name": "libxcrypt-source.tar.xz", "url": "https://github.com/besser82/libxcrypt/releases/download/v4.5.2/libxcrypt-4.5.2.tar.xz", "sha256": "71513a31c01a428bccd5367a32fd95f115d6dac50fb5b60c779d5c7942aec071" },
+  { "name": "relocatable-perl-source.tar.gz", "url": "https://codeload.github.com/skaji/relocatable-perl/tar.gz/refs/tags/5.44.0.0", "sha256": "69bc362b6388fadf88ef14b0cd769dc5e59803c04d471e1c35d6c79adcfd6907" }
+]

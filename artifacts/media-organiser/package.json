@@ -13,8 +13,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "desktop:build": "node desktop/build-renderer.mjs",
     "desktop:start": "pnpm run desktop:build && electron .",
-    "desktop:package": "pnpm run desktop:build && electron-builder --config electron-builder.yml",
-    "desktop:export": "node desktop/export-bundle.mjs"
+    "desktop:package": "pnpm run desktop:build && node desktop/package-release.mjs",
+    "desktop:export": "node desktop/export-bundle.mjs",
+    "desktop:downloads": "node desktop/publish-downloads.mjs"
   },
   "devDependencies": {
     "@fontsource/dm-sans": "^5.3.0",
